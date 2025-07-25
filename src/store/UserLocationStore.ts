@@ -8,6 +8,7 @@ export type UserLocation = {
 };
 
 interface UserLocationState {
+  isHydrated: boolean;
   location: UserLocation | null;
   error: string | null;
   setLocation: (location: UserLocation) => void;
@@ -17,6 +18,7 @@ interface UserLocationState {
 export const useUserLocationStore = create<UserLocationState>()(
   persist(
     immer((set) => ({
+      isHydrated: false,
       location: null,
       error: null,
       setLocation: (location) =>
@@ -31,6 +33,11 @@ export const useUserLocationStore = create<UserLocationState>()(
     {
       name: 'user-location-store',
       partialize: (state) => ({ location: state.location }), // only persist location
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          state.isHydrated = true;
+        }
+      },
     }
   )
 );

@@ -4,9 +4,13 @@ import { useEffect } from 'react';
 import { useUserLocationStore } from '@/store/UserLocationStore';
 
 export function useUserLocation() {
-  const { location, error, setLocation, setError } = useUserLocationStore();
+  const { location, error, setLocation, setError, isHydrated } =
+    useUserLocationStore();
 
   useEffect(() => {
+    if (!isHydrated) {
+      return;
+    }
     if (location) {
       return;
     }
@@ -34,7 +38,7 @@ export function useUserLocation() {
         }
       }
     );
-  }, [location, setLocation, setError]);
+  }, [isHydrated, location, setLocation, setError]);
 
   return { location, error };
 }

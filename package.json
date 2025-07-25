@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@phosphor-icons/react": "^2.1.10",
     "@tanstack/react-query": "^5.83.0",
     "axios": "^1.11.0",
     "class-variance-authority": "^0.7.1",
@@ -21,7 +22,8 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "tailwind-merge": "^3.3.1",
-    "zustand": "^5.0.6"
+    "zustand": "^5.0.6",
+    "radix-ui": "latest"
   },
   "devDependencies": {
     "@biomejs/biome": "2.1.2",

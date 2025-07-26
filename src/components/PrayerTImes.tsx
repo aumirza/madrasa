@@ -4,7 +4,10 @@ import { format } from 'date-fns';
 import { usePrayerTime } from '@/hooks/usePrayerTIme';
 
 export function PrayerTImes() {
-  const { data, isLoading } = usePrayerTime();
+  const { data, isLoading } = usePrayerTime({
+    latitude: 17.385_044, // hyderabad latitude
+    longitude: 78.486_671, // hyderabad longitude
+  });
 
   return (
     <div>

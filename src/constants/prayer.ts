@@ -15,9 +15,9 @@ export const ICON_MAP = {
 };
 
 export const GRADIENT_MAP = {
-  Fajr: 'from-[#3F7CE6] to-[#D6BDFF]',
+  Fajr: 'from-[#D6BDFF] to-[#3F7CE6]',
   Dhuhr: 'from-[#E77715] to-[#FFE392]',
-  Asr: 'from-[#006C5E] to-[#C9F3B3]',
-  Maghrib: 'from-[#FF9452] to-[#FF88A8]',
+  Asr: 'from-[#C9F3B3] to-[#006C5E]',
+  Maghrib: 'from-[#FF88A8] to-[#FF9452]',
   Isha: 'from-[#811DEC] to-[#381079]',
 };

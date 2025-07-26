@@ -12,15 +12,32 @@ import {
 import { PrayerTimeItem } from './PrayerTimeItem';
 import { ProgressArc } from './ProgressArc';
 import { Badge } from './ui/badge';
+import { Skeleton } from './ui/skeleton';
 
 export function PrayerCard() {
   const { data, isLoading } = usePrayerTime();
-  if (!(data || isLoading)) {
-    return <div>Error fetching prayer times</div>;
+
+  if (isLoading) {
+    return (
+      <div className="relative flex h-80 w-84 flex-col justify-between rounded-xl bg-gradient-to-t from-purple-400 to-purple-600 p-5">
+        <div className="mb-4 flex items-start justify-between">
+          <div className="">
+            <div className="flex items-center gap-2">
+              <Skeleton className="size-8 bg-white/20" />
+              <Skeleton className="h-8 w-24 bg-white/20" />
+            </div>
+            <Skeleton className="mt-2 h-4 w-40 bg-white/20" />
+          </div>
+          <Skeleton className="h-6 w-16 rounded-full bg-white/20" />
+        </div>
+      </div>
+    );
   }
+
   if (!data) {
-    return <div>Error fetching prayer times</div>;
+    return <div>Cannot get prayer time.</div>;
   }
+
   const { current } = getCurrentAndNextPrayer(data.timings);
   const allPrayers = getFivePrayerTimes(data.timings);
   const prayerProgress = calculatePrayerProgress(data.timings);
@@ -37,7 +54,6 @@ export function PrayerCard() {
         GRADIENT_MAP[current as keyof typeof GRADIENT_MAP] || 'bg-purple-800'
       )}
     >
-      {isLoading && <p>Loading...</p>}
       <div className="mb-4 flex items-start justify-between">
         <div className="">
           <div className="flex items-center gap-2">

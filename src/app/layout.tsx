@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import Head from 'next/head';
 import { BottomNavbar } from '@/components/BottomNavbar';
+import DebugConsole from '@/components/DebugConsole';
 import { Header } from '@/components/Header';
 import { Providers } from '@/components/Providers';
 
@@ -87,6 +88,7 @@ export default function RootLayout({
             <main className="flex-1 bg-gray-100">{children}</main>
             <BottomNavbar />
           </div>
+          <DebugConsole />
         </Providers>
       </body>
     </html>

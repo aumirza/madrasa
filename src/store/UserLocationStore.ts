@@ -1,17 +1,13 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-
-export type UserLocation = {
-  latitude: number;
-  longitude: number;
-};
+import type { GeoLocation } from '@/types';
 
 interface UserLocationState {
   isHydrated: boolean;
-  location: UserLocation | null;
+  location: GeoLocation | null;
   error: string | null;
-  setLocation: (location: UserLocation) => void;
+  setLocation: (location: GeoLocation) => void;
   setError: (error: string | null) => void;
 }
 

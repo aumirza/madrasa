@@ -3,7 +3,7 @@
 import { GRADIENT_MAP, ICON_MAP } from '@/constants/prayer';
 import { usePrayerTime } from '@/hooks/usePrayerTIme';
 import { cn } from '@/lib/utils';
-import type { GeoLocation } from '@/types';
+import { getErrorMessage } from '@/utils/getErrorMessage';
 import {
   calculatePrayerProgress,
   getCurrentAndNextPrayer,
@@ -15,14 +15,17 @@ import { ProgressArc } from './ProgressArc';
 import { Badge } from './ui/badge';
 import { Skeleton } from './ui/skeleton';
 
-export function PrayerCard({ ipLocation }: { ipLocation: GeoLocation }) {
-  const { data, isLoading } = usePrayerTime(ipLocation);
+export function PrayerCard() {
+  const { data, isLoading, error } = usePrayerTime();
 
   if (isLoading) {
     return (
-      <div className="relative flex h-80 w-84 flex-col justify-between rounded-xl bg-gradient-to-t from-purple-400 to-purple-600 p-5">
+      <div
+        aria-live="polite"
+        className="relative flex h-80 w-84 flex-col justify-between rounded-xl bg-gradient-to-t from-purple-400 to-purple-600 p-5"
+      >
         <div className="mb-4 flex items-start justify-between">
-          <div className="">
+          <div>
             <div className="flex items-center gap-2">
               <Skeleton className="size-8 bg-white/20" />
               <Skeleton className="h-8 w-24 bg-white/20" />
@@ -35,8 +38,32 @@ export function PrayerCard({ ipLocation }: { ipLocation: GeoLocation }) {
     );
   }
 
+  if (error) {
+    return (
+      <div
+        aria-live="assertive"
+        className="relative flex h-80 w-84 flex-col items-center justify-center rounded-xl bg-gradient-to-t from-red-400 to-red-600 p-5"
+        role="alert"
+      >
+        <p className="font-semibold text-lg text-white">
+          Error: {getErrorMessage(error)}
+        </p>
+      </div>
+    );
+  }
+
   if (!data) {
-    return <div>Cannot get prayer time.</div>;
+    return (
+      <div
+        aria-live="assertive"
+        className="relative flex h-80 w-84 flex-col items-center justify-center rounded-xl bg-gradient-to-t from-gray-400 to-gray-600 p-5"
+        role="alert"
+      >
+        <p className="font-semibold text-lg text-white">
+          Cannot get prayer time.
+        </p>
+      </div>
+    );
   }
 
   const { current } = getCurrentAndNextPrayer(data.timings);

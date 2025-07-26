@@ -3,6 +3,7 @@
 import { GRADIENT_MAP, ICON_MAP } from '@/constants/prayer';
 import { usePrayerTime } from '@/hooks/usePrayerTIme';
 import { cn } from '@/lib/utils';
+import type { GeoLocation } from '@/types';
 import {
   calculatePrayerProgress,
   getCurrentAndNextPrayer,
@@ -14,8 +15,8 @@ import { ProgressArc } from './ProgressArc';
 import { Badge } from './ui/badge';
 import { Skeleton } from './ui/skeleton';
 
-export function PrayerCard() {
-  const { data, isLoading } = usePrayerTime();
+export function PrayerCard({ ipLocation }: { ipLocation: GeoLocation }) {
+  const { data, isLoading } = usePrayerTime(ipLocation);
 
   if (isLoading) {
     return (

@@ -1,45 +1,57 @@
-import { useQuery } from '@tanstack/react-query';
 import { isToday } from 'date-fns';
-import { createEndpoint } from '@/lib/api';
-import { axiosClient } from '@/lib/axios';
+import { useEffect, useMemo, useState } from 'react';
+
 import { usePrayerTimeStore } from '@/store/PrayerTimeStore';
-import type { PrayerTimesResponse } from '@/types/response';
+import type { GeoLocation } from '@/types';
+import { usePrayerTimeQuery } from './usePrayerTimeQuery';
 import { useUserLocation } from './useUserLocation';
 
-export const usePrayerTime = () => {
-  const { location, error: locationError } = useUserLocation();
+export const usePrayerTime = (ipLocation: GeoLocation) => {
+  const [location, setLocation] = useState<GeoLocation | null>(null);
+  const { location: userLocation, error: locationError } = useUserLocation();
   const prayerTimes = usePrayerTimeStore((state) => state.prayerTimes);
   const setPrayerTimes = usePrayerTimeStore((state) => state.setPrayerTimes);
 
-  const query = useQuery({
-    queryKey: ['prayer-time', location?.latitude, location?.longitude],
-    select: (data) => data.data,
-    enabled:
-      !!location && !!location.latitude && !!location.longitude && !prayerTimes,
-    queryFn: async () => {
-      if (!location) {
-        return { data: null, isLoading: false };
-      }
+  // Set location based on user or fallback to IP
+  useEffect(() => {
+    if (locationError) {
+      setLocation(ipLocation);
+      return;
+    }
+    if (userLocation) {
+      setLocation({
+        latitude: userLocation.latitude,
+        longitude: userLocation.longitude,
+      });
+    }
+  }, [userLocation, locationError, ipLocation]);
 
-      const response = await axiosClient.get(
-        createEndpoint.getTodaysPrayerTimes(),
-        {
-          params: {
-            latitude: location?.latitude,
-            longitude: location?.longitude,
-          },
-        }
-      );
-      setPrayerTimes(response.data.data);
-      return response.data as PrayerTimesResponse;
-    },
-    refetchOnWindowFocus: false,
-  });
+  // Memoize readable date for query
+  const readableDate = useMemo(
+    () => prayerTimes?.date?.readable || '',
+    [prayerTimes]
+  );
+  const query = usePrayerTimeQuery(location, readableDate);
 
+  // Update store when new timings arrive
+  useEffect(() => {
+    if (query.data?.timings) {
+      setPrayerTimes(query.data);
+    }
+  }, [query.data, setPrayerTimes]);
+
+  // Early return: loading state
   if (!(location?.latitude && location.longitude)) {
-    return { data: null, isLoading: true, locationError };
+    return { data: null, isLoading: true };
   }
 
+  // if (locationError) {
+  //   console.error('Error fetching user location:', locationError);
+  // can show location error to user but we are using ip fallback , so not needed
+  //   return { data: null, isLoading: false };
+  // }
+
+  // Use cached prayer times if available and up-to-date
   if (
     prayerTimes &&
     prayerTimes.meta.latitude === location.latitude &&
@@ -49,11 +61,9 @@ export const usePrayerTime = () => {
     return { data: prayerTimes, isLoading: false };
   }
 
-  if (locationError) {
-    // biome-ignore lint/suspicious/noConsole: false positive
-    console.error('Error fetching user location:', locationError);
-    return { data: null, isLoading: false, locationError };
-  }
-
-  return query;
+  // Default: return query result
+  return {
+    data: query.data,
+    isLoading: query.isLoading,
+  };
 };

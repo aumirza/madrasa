@@ -13,3 +13,18 @@ export const getLocationFromIp = async (
     longitude: data.longitude || 0,
   };
 };
+
+export const getMyIpLocation = async (): Promise<{
+  latitude: number;
+  longitude: number;
+}> => {
+  const response = await fetch('https://ipapi.co/json/');
+  if (!response.ok) {
+    throw new Error('Failed to fetch IP location');
+  }
+  const data = await response.json();
+  return {
+    latitude: data.latitude || 0,
+    longitude: data.longitude || 0,
+  };
+};

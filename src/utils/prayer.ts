@@ -53,6 +53,17 @@ export function getCurrentAndNextPrayer(
     }
   }
 
+  // Special handling: after midnight but before Fajr, treat current as Isha
+  const fajrTime = parseTimeToDate(timings.Fajr, today);
+  const ishaDate = new Date(today);
+  ishaDate.setDate(ishaDate.getDate() - 1);
+  const ishaTime = parseTimeToDate(timings.Isha, ishaDate);
+  if (now > ishaTime && now < fajrTime) {
+    current = 'Isha';
+    next = 'Fajr';
+    nextTime = timings.Fajr;
+  }
+
   return { current, next, nextTime };
 }
 
@@ -115,6 +126,20 @@ export function calculatePrayerProgress(
     // If this prayer comes before the current prayer, it's completed
     if (prayers.findIndex((p) => p.name === current) > index) {
       return 1;
+    }
+
+    // Special handling for Isha after midnight but before Fajr
+    if (prayer.name === 'Isha' && current === 'Isha') {
+      const fajrTime = parseTimeToDate(timings.Fajr, today);
+      const ishaDate = new Date(today);
+      let currentPrayerTime = parseTimeToDate(timings.Isha, today);
+      if (now < fajrTime && now.getHours() < 6) {
+        ishaDate.setDate(ishaDate.getDate() - 1);
+        currentPrayerTime = parseTimeToDate(timings.Isha, ishaDate);
+      }
+      const totalDuration = fajrTime.getTime() - currentPrayerTime.getTime();
+      const elapsed = now.getTime() - currentPrayerTime.getTime();
+      return Math.min(Math.max(elapsed / totalDuration, 0), 1);
     }
 
     // If this is the current prayer, calculate progress
